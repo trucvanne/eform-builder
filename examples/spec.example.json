@@ -1,0 +1,161 @@
+{
+ "source": "BieuMau.xlsx (ví dụ, rút gọn 6 dòng)",
+ "forms": {
+  "tinh": {
+   "sheet": "Tinh",
+   "name": "Tình hình, kết quả giải quyết TTHC thuộc phạm vi thẩm quyền của UBND cấp tỉnh",
+   "group": "Biểu mẫu Kiểm soát TTHC",
+   "attr": "TTHC_CapTinh",
+   "title": "Bảng tình hình giải quyết TTHC cấp tỉnh",
+   "heading": "TÌNH HÌNH, KẾT QUẢ GIẢI QUYẾT THỦ TỤC HÀNH CHÍNH THUỘC PHẠM VI THẨM QUYỀN CỦA UBND CẤP TỈNH",
+   "fixed_row": true,
+   "sticky_header": true,
+   "columns": [
+    {
+     "title": "Lĩnh vực giải quyết",
+     "attr": "Lĩnh vực giải quyết",
+     "type": "Text",
+     "width": 300,
+     "fixed": [
+      "Lĩnh vực hộ tịch",
+      "Lĩnh vực quốc tịch",
+      "Lĩnh vực nuôi con nuôi",
+      "Lĩnh vực Luật sư",
+      "Lĩnh vực Công chứng",
+      "Lĩnh vực Thừa phát lại"
+     ]
+    },
+    {
+     "title": "Năm",
+     "attr": "Năm",
+     "type": "Text",
+     "width": 80,
+     "fixed": [
+      "2026",
+      "2026",
+      "2026",
+      "2026",
+      "2026",
+      "2026"
+     ]
+    },
+    {
+     "title": "Tháng",
+     "attr": "Tháng",
+     "type": "Text",
+     "width": 80,
+     "fixed": [
+      "10",
+      "10",
+      "10",
+      "10",
+      "10",
+      "10"
+     ]
+    },
+    {
+     "title": "Số lượng hồ sơ tiếp nhận",
+     "attr": "Số lượng hồ sơ tiếp nhận",
+     "children": [
+      {
+       "title": "Tổng số",
+       "attr": "Số lượng hồ sơ tiếp nhận - Tổng số",
+       "type": "Number",
+       "width": 120
+      },
+      {
+       "title": "Trong kỳ",
+       "attr": "Số lượng hồ sơ tiếp nhận - Trong kỳ",
+       "children": [
+        {
+         "title": "Trực tuyến toàn trình",
+         "attr": "Số lượng hồ sơ tiếp nhận Trong kỳ - Trực tuyến toàn trình",
+         "type": "Number",
+         "width": 120
+        },
+        {
+         "title": "Trực tuyến một phần",
+         "attr": "Số lượng hồ sơ tiếp nhận Trong kỳ - Trực tuyến một phần",
+         "type": "Number",
+         "width": 120
+        },
+        {
+         "title": "Qua dịch vụ bưu chính",
+         "attr": "Số lượng hồ sơ tiếp nhận Trong kỳ - Qua dịch vụ bưu chính",
+         "type": "Number",
+         "width": 120
+        },
+        {
+         "title": "Trực tiếp",
+         "attr": "Số lượng hồ sơ tiếp nhận Trong kỳ - Trực tiếp",
+         "type": "Number",
+         "width": 120
+        }
+       ]
+      },
+      {
+       "title": "Từ kỳ trước",
+       "attr": "Số lượng hồ sơ tiếp nhận - Từ kỳ trước",
+       "type": "Number",
+       "width": 120
+      }
+     ]
+    },
+    {
+     "title": "Số lượng hồ sơ đã giải quyết",
+     "attr": "Số lượng hồ sơ đã giải quyết",
+     "children": [
+      {
+       "title": "Tổng số",
+       "attr": "Số lượng hồ sơ đã giải quyết - Tổng số",
+       "type": "Number",
+       "width": 120
+      },
+      {
+       "title": "Trước hạn",
+       "attr": "Số lượng hồ sơ đã giải quyết - Trước hạn",
+       "type": "Number",
+       "width": 120
+      },
+      {
+       "title": "Đúng hạn",
+       "attr": "Số lượng hồ sơ đã giải quyết - Đúng hạn",
+       "type": "Number",
+       "width": 120
+      },
+      {
+       "title": "Quá hạn",
+       "attr": "Số lượng hồ sơ đã giải quyết - Quá hạn",
+       "type": "Number",
+       "width": 120
+      }
+     ]
+    },
+    {
+     "title": "Số lượng hồ sơ đang giải quyết",
+     "attr": "Số lượng hồ sơ đang giải quyết",
+     "children": [
+      {
+       "title": "Tổng số",
+       "attr": "Số lượng hồ sơ đang giải quyết - Tổng số",
+       "type": "Number",
+       "width": 120
+      },
+      {
+       "title": "Trong hạn",
+       "attr": "Số lượng hồ sơ đang giải quyết - Trong hạn",
+       "type": "Number",
+       "width": 120
+      },
+      {
+       "title": "Quá hạn",
+       "attr": "Số lượng hồ sơ đang giải quyết - Quá hạn",
+       "type": "Number",
+       "width": 120
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

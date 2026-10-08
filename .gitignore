@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.DS_Store
+spec*.json
+!examples/spec.example.json
+findings.json
+approvals.json
+changelog.md

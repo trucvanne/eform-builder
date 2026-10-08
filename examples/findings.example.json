@@ -1,0 +1,80 @@
+{
+ "style": "new",
+ "findings": [
+  {
+   "id": "F001",
+   "form": "tinh",
+   "where": "Dữ liệu cố định \"Lĩnh vực giải quyết\" dòng 4",
+   "current": "Lĩnh vực Luật sư",
+   "suggestion": "Lĩnh vực luật sư",
+   "reasons": [
+    "Viết hoa giữa cụm từ không phải danh từ riêng; chuẩn viết hoa chữ đầu"
+   ],
+   "kind": "fix",
+   "severity": "medium",
+   "loc": {
+    "type": "fixed",
+    "path": [
+     "Lĩnh vực giải quyết"
+    ],
+    "row": 3
+   }
+  },
+  {
+   "id": "F002",
+   "form": "tinh",
+   "where": "Dữ liệu cố định \"Lĩnh vực giải quyết\" dòng 5",
+   "current": "Lĩnh vực Công chứng",
+   "suggestion": "Lĩnh vực công chứng",
+   "reasons": [
+    "Viết hoa giữa cụm từ không phải danh từ riêng; chuẩn viết hoa chữ đầu"
+   ],
+   "kind": "fix",
+   "severity": "medium",
+   "loc": {
+    "type": "fixed",
+    "path": [
+     "Lĩnh vực giải quyết"
+    ],
+    "row": 4
+   }
+  },
+  {
+   "id": "F003",
+   "form": "tinh",
+   "where": "Dữ liệu cố định \"Lĩnh vực giải quyết\" dòng 6",
+   "current": "Lĩnh vực Thừa phát lại",
+   "suggestion": "Lĩnh vực thừa phát lại",
+   "reasons": [
+    "Viết hoa giữa cụm từ không phải danh từ riêng; chuẩn viết hoa chữ đầu"
+   ],
+   "kind": "fix",
+   "severity": "medium",
+   "loc": {
+    "type": "fixed",
+    "path": [
+     "Lĩnh vực giải quyết"
+    ],
+    "row": 5
+   }
+  },
+  {
+   "id": "F004",
+   "form": "tinh",
+   "where": "Dữ liệu cố định \"Tháng\"",
+   "current": "10",
+   "suggestion": null,
+   "reasons": [
+    "Nguồn ghi tháng 8 nhưng dữ liệu là 10"
+   ],
+   "kind": "question",
+   "severity": "medium",
+   "loc": {
+    "type": "fixed_all",
+    "path": [
+     "Tháng"
+    ]
+   }
+  }
+ ]
+}
