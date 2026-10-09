@@ -34,9 +34,10 @@
 
 ## Điểm dễ lỗi
 - **Cột mới tạo lưu kiểu `null`** dù giao diện hiện "Text". Cách sửa: chọn kiểu khác rồi chọn lại Text.
-- Ô nhập là React controlled: nhập bằng focus + select + `Input.insertText` (CDP). Không gán `.value` trực tiếp.
+- Ô nhập là React controlled: nhập bằng focus + select + chèn chữ thật (`Input.insertText` của CDP, `keyboard.insert_text` của Playwright). Không gán `.value` trực tiếp.
 - Nút trong hộp thoại: dùng `element.click()` (JS) cho ổn định. Click chuột theo tọa độ dễ trượt khi danh sách đang render lại.
-- Combobox/lựa chọn MUI: dùng click chuột thật (mousePressed/Released).
+- Combobox/lựa chọn MUI: dùng click chuột thật (sự kiện `isTrusted`), không dùng `element.click()`.
+- Playwright (Firefox/WebKit): chờ bằng `page.wait_for_timeout`, không dùng `time.sleep` khi cần đọc `page.url`, vì Playwright chỉ cập nhật trạng thái khi có lệnh gọi.
 - Đánh dấu thuộc tính trong nội dung: gõ `[[` + vài ký tự rồi Enter để chọn gợi ý. Gõ tay đủ `[[ten]]` mà không chọn gợi ý thì không thành control.
 - Mở lại trang danh sách sau khi lưu: thứ tự dòng thay đổi theo ngày cập nhật. Luôn tìm dòng theo **tên**, không theo vị trí.
 

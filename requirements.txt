@@ -1,0 +1,3 @@
+openpyxl>=3.0
+# Chỉ cần khi dùng Firefox/WebKit: pip install playwright && playwright install firefox webkit
+# playwright>=1.40

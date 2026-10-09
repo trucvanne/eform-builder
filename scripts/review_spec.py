@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 """Rà soát spec Eform: chính tả, viết hoa, kiểu bỏ dấu, tiền tố thừa, trùng lặp, dòng nghi vấn.
 
-Dùng:  python3 review_spec.py spec.json [--source-title "THÁNG 8"] [--out findings.json]
-Đầu ra: findings.json (mỗi phát hiện = 1 dòng cần duyệt) + bảng Markdown in ra màn hình.
-Script KHÔNG sửa spec. Việc sửa chỉ làm qua apply_fixes.py với approvals.json do người dùng duyệt từng dòng.
+Dùng:  python3 review_spec.py spec.json [--source-title "THÁNG 8"] [--out findings.json] [--xlsx duyet.xlsx]
+Đầu ra: findings.json (mỗi phát hiện = 1 dòng cần duyệt) + bảng Markdown in ra màn hình
+        + phiếu duyệt Excel duyet.xlsx (cột "Quyết định" cho từng dòng; --xlsx "" để không tạo).
+Script KHÔNG sửa spec. Việc sửa chỉ làm qua apply_fixes.py với approvals.json hoặc duyet.xlsx do người dùng duyệt từng dòng.
 """
 import argparse, json, re, sys, os
 from collections import Counter
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from vn_text import nfc, suspicious_words, tone_style, to_style, sentence_case, AGENCY_HEADS
+from common import utf8_console
 
 TYPO_DICT = {  # lỗi gõ hay gặp trong danh mục hành chính -> đề xuất
     'Văn phong Ủy ban': 'Văn phòng Ủy ban', 'Văn phong Uỷ ban': 'Văn phòng Uỷ ban',
@@ -33,6 +35,8 @@ def main():
     ap.add_argument('spec')
     ap.add_argument('--source-title', default='', help='Tiêu đề/tên file nguồn, vd "BIỂU MẪU BC THÁNG 8" để đối chiếu kỳ báo cáo')
     ap.add_argument('--out', default='findings.json')
+    ap.add_argument('--xlsx', default='duyet.xlsx', help='phiếu duyệt Excel cho người dùng; "" để không tạo')
+    utf8_console()
     a = ap.parse_args()
     spec = json.load(open(a.spec, encoding='utf-8'))
 
@@ -158,6 +162,10 @@ def main():
     for i, x in enumerate(findings, 1):
         print(f"| {i} | {x['id']} | {x['form']} | {x['where']} | {x['current']} | {x['suggestion'] or '(cần xác nhận)'} | {'; '.join(x['reasons'])} |")
     print(f'\nTổng: {len(findings)} phát hiện ({sum(1 for x in findings if x["kind"]=="fix")} có đề xuất sửa, {sum(1 for x in findings if x["kind"]=="question")} cần xác nhận). Kết quả: {a.out}')
+    if a.xlsx:
+        from approval_sheet import write_sheet
+        write_sheet(findings, a.xlsx)
+        print(f'Phiếu duyệt từng dòng: {a.xlsx} (chọn cột "Quyết định" cho từng dòng rồi chạy apply_fixes.py)')
 
 
 if __name__ == '__main__':

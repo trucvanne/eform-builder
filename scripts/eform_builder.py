@@ -1,36 +1,22 @@
 # -*- coding: utf-8 -*-
 """Cấu hình Eform dạng bảng (x-table, cố định số dòng, cột nhóm nhiều tầng) trên Nền tảng khai phá dữ liệu động từ spec.json.
 
-Hệ thống được clone cho nhiều đơn vị nên domain KHÔNG cố định: script tự lấy địa chỉ từ tab Chrome đang mở
+Hệ thống được clone cho nhiều đơn vị nên domain KHÔNG cố định: script tự lấy địa chỉ từ tab đang mở
 trang danh sách Eform (/list-eform), hoặc nhận qua --base-url https://<domain-cua-don-vi>.
-Yêu cầu: Chrome mở với --remote-debugging-port (mặc định 9334), người dùng TỰ đăng nhập và mở trang danh sách Eform.
-Lệnh:
+Trình duyệt (xem browser.py):
+  --browser cdp (mặc định)  : Chrome / Edge / Cốc Cốc / Brave / Chromium đã mở bằng 'python browser.py open ...'
+  --browser firefox|webkit  : Playwright tự mở cửa sổ, cần --base-url; người dùng TỰ đăng nhập.
+Lệnh (Windows dùng 'python' hoặc 'py' thay cho 'python3'):
   python3 eform_builder.py build  --spec spec.json --form KEY            # dry-run: dựng xong, in kiểm tra, HỦY BỎ (không lưu)
   python3 eform_builder.py build  --spec spec.json --form KEY --save     # dựng và Lưu (Lưu nháp) + đối chiếu dữ liệu gửi lên
   python3 eform_builder.py verify --spec spec.json --form KEY            # đọc cấu hình đã lưu trên server, so với spec (không sửa)
 Script không bao giờ bấm Phát hành / Phân quyền / Xóa.
 """
-import argparse, json, os, sys, time, urllib.request
-from urllib.parse import urlparse
+import argparse, json, os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from cdp import WS, ev
+from browser import make_driver, CHROMIUM, PLAYWRIGHT
+from common import utf8_console
 
-EFORM_PATHS = ('/list-eform', '/detail-eform', '/e-form/', '/quan-ly-nhom-eform')
-
-
-def find_tab(port, base_url=None):
-    """Chọn tab Chrome của hệ thống Eform: theo --base-url nếu có, ngược lại tab đang mở trang Eform."""
-    tabs = [t for t in json.load(urllib.request.urlopen(f'http://127.0.0.1:{port}/json')) if t.get('type') == 'page']
-    if base_url:
-        host = urlparse(base_url).netloc
-        tabs = [t for t in tabs if urlparse(t['url']).netloc == host]
-    else:
-        tabs = [t for t in tabs if any(p in t['url'] for p in EFORM_PATHS)]
-    if not tabs:
-        raise SystemExit('Không tìm thấy tab hệ thống Eform. Hãy đăng nhập và mở trang danh sách Eform (…/list-eform) '
-                         'trong Chrome đang chạy với --remote-debugging-port, hoặc truyền --base-url.')
-    u = urlparse(tabs[0]['url'])
-    return tabs[0]['webSocketDebuggerUrl'], f'{u.scheme}://{u.netloc}'
 HELPERS = r"""
 window.T=(t,s)=>[...document.querySelectorAll((s?s+' ':'')+'*')].filter(e=>(e.innerText||'').trim()===t&&e.getBoundingClientRect().height>0).sort((a,b)=>a.getBoundingClientRect().width*a.getBoundingClientRect().height-b.getBoundingClientRect().width*b.getBoundingClientRect().height)[0];
 window.B=(l,i)=>[...document.querySelectorAll('button')].filter(b=>(b.getAttribute('aria-label')||b.title||b.innerText||'').trim()===l&&b.getBoundingClientRect().height>0)[i||0];
@@ -49,15 +35,14 @@ window.__toasts=[];new MutationObserver(()=>{document.querySelectorAll('.Toastif
 
 
 class Page:
-    def __init__(self, port=9334, base_url=None):
-        wsurl, self.base = find_tab(port, base_url)
-        self.ws = WS(wsurl)
+    def __init__(self, a):
+        self.d = make_driver(a.browser, a.port, a.base_url, a.profile)
+        self.base = self.d.base
         print('Hệ thống:', self.base)
-        self.ws.call('Emulation.setDeviceMetricsOverride', width=2100, height=1260, deviceScaleFactor=1, mobile=False)
-        self.ws.call('Emulation.setFocusEmulationEnabled', enabled=True)
+        self.d.set_viewport(2100, 1260)
 
     def js(self, expr):
-        return ev(self.ws, expr)
+        return self.d.eval(expr)
 
     def helpers(self):
         return self.js(HELPERS)
@@ -81,22 +66,21 @@ class Page:
         r = self.js('(()=>{const e=(%s);if(!e)return null;e.scrollIntoView({block:"nearest"});const b=e.getBoundingClientRect();return [b.x+b.width/2,b.y+b.height/2]})()' % expr)
         if not isinstance(r, list):
             raise RuntimeError('không tìm thấy để bấm chuột: ' + expr[:120])
-        for t in ('mouseMoved', 'mousePressed', 'mouseReleased'):
-            self.ws.call('Input.dispatchMouseEvent', type=t, x=r[0], y=r[1], button='left', clickCount=1)
+        self.d.click_at(r[0], r[1])
         time.sleep(pause)
 
     def type_into(self, expr, text):
         r = self.js('(()=>{const i=(%s);if(!i)return "NF";i.focus();i.select&&i.select();return "ok"})()' % expr)
         if r != 'ok':
             raise RuntimeError('không tìm thấy ô nhập: ' + expr[:120])
-        self.ws.call('Input.insertText', text=str(text))
+        self.d.insert_text(text)
 
     def choose_option(self, combo_expr, label):
         self.mclick(combo_expr, 0.5)
         self.mclick('[...document.querySelectorAll("[role=option]")].find(o=>o.innerText.trim()==%s)' % json.dumps(label), 0.4)
 
     def nav(self, url, wait=3):
-        self.ws.call('Page.navigate', url=url); time.sleep(wait); self.helpers()
+        self.d.goto(url); time.sleep(wait); self.helpers()
 
 
 def size(col):
@@ -180,8 +164,7 @@ def compare(spec_form, meta):
     return ok
 
 
-def cmd_build(a, spec, form):
-    p = Page(a.port, a.base_url)
+def cmd_build(p, a, form):
     p.nav(p.base + '/list-eform', 3.5)
     p.jsclick('B("Thêm mới")', 3)
     p.helpers()
@@ -209,11 +192,10 @@ def cmd_build(a, spec, form):
     # nội dung: tiêu đề + bảng
     ed = 'document.querySelector(".ck-editor__editable").ckeditorInstance'
     p.mclick('document.querySelector(".ck-editor__editable")', 0.4)
-    p.ws.call('Input.insertText', text=form.get('heading') or form['name'].upper())
+    p.d.insert_text(form.get('heading') or form['name'].upper())
     p.js('(()=>{const ed=%s;const root=ed.model.document.getRoot();ed.model.change(w=>w.setSelection(root.getChild(0),"in"));ed.execute("bold");ed.execute("alignment",{value:"center"});ed.execute("fontSize",{value:"16px"});ed.model.change(w=>{const q=w.createElement("paragraph");w.insert(q,root,"end");w.setSelection(q,"in")});ed.editing.view.focus();return 1})()' % ed)
-    p.ws.call('Input.insertText', text='[[' + form['attr'][:-1]); time.sleep(1)
-    for t in ('keyDown', 'keyUp'):
-        p.ws.call('Input.dispatchKeyEvent', type=t, key='Enter', code='Enter', windowsVirtualKeyCode=13)
+    p.d.insert_text('[[' + form['attr'][:-1]); time.sleep(1)
+    p.d.press('Enter')
     time.sleep(1)
     html = p.js('%s.getData()' % ed)
     assert ('[[%s]]' % form['attr']) in html, 'chưa chèn được thuộc tính vào nội dung'
@@ -233,8 +215,7 @@ def cmd_build(a, spec, form):
     print('Đối chiếu dữ liệu gửi lên:', 'KHỚP' if compare(form, meta) else 'LỆCH')
 
 
-def cmd_verify(a, spec, form):
-    p = Page(a.port, a.base_url)
+def cmd_verify(p, a, form):
     p.nav(p.base + '/list-eform', 3.5)
     p.js('window.__cap=[],1')
     p.jsclick('[...document.querySelectorAll("tbody tr")].find(r=>r.querySelectorAll("td")[1].innerText.trim()==%s).querySelector(\'button[title="Chỉnh sửa eform"], button[aria-label="Chỉnh sửa eform"]\')' % json.dumps(form['name']), 3.5)
@@ -248,15 +229,23 @@ def cmd_verify(a, spec, form):
 
 
 def main():
+    utf8_console()
     ap = argparse.ArgumentParser()
     ap.add_argument('cmd', choices=['build', 'verify'])
     ap.add_argument('--spec', required=True); ap.add_argument('--form', required=True)
     ap.add_argument('--save', action='store_true'); ap.add_argument('--port', type=int, default=9334)
-    ap.add_argument('--base-url', default=None, help='vd https://<domain-cua-don-vi>; bỏ trống để tự lấy từ tab đang mở')
+    ap.add_argument('--base-url', default=None, help='vd https://<domain-cua-don-vi>; bỏ trống để tự lấy từ tab đang mở (chỉ với CDP)')
+    ap.add_argument('--browser', default='cdp', choices=('cdp',) + CHROMIUM + PLAYWRIGHT,
+                    help='cdp/chrome/edge/coccoc/brave/chromium: gắn vào trình duyệt đã mở; firefox/webkit: Playwright')
+    ap.add_argument('--profile', default=None, help='thư mục hồ sơ riêng cho firefox/webkit')
     a = ap.parse_args()
     spec = json.load(open(a.spec, encoding='utf-8'))
     form = spec['forms'][a.form]
-    (cmd_build if a.cmd == 'build' else cmd_verify)(a, spec, form)
+    p = Page(a)
+    try:
+        (cmd_build if a.cmd == 'build' else cmd_verify)(p, a, form)
+    finally:
+        p.d.close()
 
 
 if __name__ == '__main__':

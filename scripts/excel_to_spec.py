@@ -10,12 +10,15 @@ Dùng:
 - Cột còn lại (trừ --skip, mặc định cột A = STT vì bảng tự đánh STT): KIỂU Number, để người nhập điền.
 - Nếu --spec đã tồn tại, form mới được thêm/ghi đè vào khóa --key.
 """
-import argparse, json, os
+import argparse, json, os, sys
 import openpyxl
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from common import utf8_console
 from openpyxl.utils import column_index_from_string, get_column_letter
 
 
 def main():
+    utf8_console()
     ap = argparse.ArgumentParser()
     ap.add_argument('xlsx'); ap.add_argument('--sheet', required=True); ap.add_argument('--key', required=True)
     ap.add_argument('--group', default=''); ap.add_argument('--attr', required=True)

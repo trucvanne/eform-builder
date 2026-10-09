@@ -2,6 +2,7 @@
 """Áp dụng CHỈ những phát hiện đã được người dùng duyệt từng dòng vào spec.
 
 Dùng:  python3 apply_fixes.py spec.json findings.json approvals.json --out spec.fixed.json [--log changelog.md]
+  hoặc python3 apply_fixes.py spec.json findings.json duyet.xlsx     --out spec.fixed.json   (phiếu duyệt Excel, xem approval_sheet.py)
 
 approvals.json: { "F002": "approve", "F003": "reject", "F017": {"value": "Giá trị người dùng tự nhập"} }
   - "approve"          : dùng giá trị 'suggestion' của phát hiện
@@ -9,7 +10,9 @@ approvals.json: { "F002": "approve", "F003": "reject", "F017": {"value": "Giá t
   - "reject" / thiếu   : giữ nguyên (mặc định an toàn: không có duyệt = không đổi)
 Mỗi thay đổi kiểm tra lại giá trị hiện tại trước khi ghi; lệch thì bỏ qua và báo.
 """
-import argparse, json, sys
+import argparse, json, os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from common import utf8_console
 
 
 def find_col(cols, path):
@@ -26,11 +29,17 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('spec'); ap.add_argument('findings'); ap.add_argument('approvals')
     ap.add_argument('--out', required=True); ap.add_argument('--log', default='changelog.md')
+    utf8_console()
     a = ap.parse_args()
     spec = json.load(open(a.spec, encoding='utf-8'))
     fnd = {x['id']: x for x in json.load(open(a.findings, encoding='utf-8'))['findings']}
-    appr = json.load(open(a.approvals, encoding='utf-8'))
     log, skipped = [], []
+    if a.approvals.lower().endswith(('.xlsx', '.xlsm')):
+        from approval_sheet import read_sheet
+        appr, warn = read_sheet(a.approvals)
+        skipped += warn
+    else:
+        appr = json.load(open(a.approvals, encoding='utf-8'))
     for fid, dec in appr.items():
         x = fnd.get(fid)
         if x is None:
