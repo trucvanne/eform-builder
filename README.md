@@ -14,9 +14,11 @@ Hệ thống được clone cho nhiều đơn vị nên domain không cố đị
 | Bạn dùng | Cách dùng |
 |---|---|
 | **Claude Code** | Chép thư mục vào `~/.claude/skills/eform-builder`. Gọi `/eform-builder` hoặc nói "cấu hình eform từ excel". |
-| **AI khác hỗ trợ SKILL.md** (Codex CLI, Gemini CLI, Cursor, Copilot, …) | Chép thư mục vào thư mục skills của công cụ đó (xem tài liệu của công cụ). AI đọc `SKILL.md`. |
+| **Codex** (app, CLI, VS Code; đăng nhập bằng tài khoản ChatGPT) | Đủ quy trình. Xem mục [Dùng với ChatGPT / Codex](#dùng-với-chatgpt--codex). |
+| **ChatGPT web / app chat** | Chỉ phần dữ liệu (đọc Excel, rà soát, duyệt). Xem mục [Dùng với ChatGPT / Codex](#dùng-với-chatgpt--codex). |
+| **AI khác hỗ trợ SKILL.md** (Gemini CLI, Cursor, Copilot, …) | Chép thư mục vào thư mục skills của công cụ đó (xem tài liệu của công cụ). AI đọc `SKILL.md`. |
 | **AI khác chạy được lệnh nhưng không hỗ trợ skill** | Mở thư mục này làm thư mục làm việc; AI đọc `AGENTS.md` rồi `SKILL.md`. |
-| **AI chat trên web** (ChatGPT, Gemini, …) hoặc **không dùng AI** | Làm theo [`HUONG_DAN_CHAY_TAY.md`](HUONG_DAN_CHAY_TAY.md). |
+| **AI chat trên web khác** (Gemini, …) hoặc **không dùng AI** | Làm theo [`HUONG_DAN_CHAY_TAY.md`](HUONG_DAN_CHAY_TAY.md). |
 
 | Trình duyệt | Cách điều khiển | Cài thêm |
 |---|---|---|
@@ -34,6 +36,31 @@ git clone https://github.com/trucvanne/eform-builder.git ~/.claude/skills/eform-
 ```
 
 Người dùng tự đăng nhập; công cụ không nhập mật khẩu.
+
+## Dùng với ChatGPT / Codex
+
+> Chưa thử trực tiếp trên ChatGPT/Codex. Đường dẫn và tính năng dưới đây theo tài liệu OpenAI tại thời điểm viết; kiểm tra lại nếu khác.
+
+| | Codex (app, CLI, VS Code) | ChatGPT web / app chat |
+|---|---|---|
+| Chạy ở đâu | Trên máy bạn | Máy chủ OpenAI (không điều khiển được trình duyệt trên máy bạn) |
+| Đọc Excel, rà soát, duyệt từng dòng | Được | Được |
+| Cấu hình lên hệ thống Eform | Được | **Không** — tự chạy trên máy theo `HUONG_DAN_CHAY_TAY.md` mục 1 và 4 |
+| Duyệt từng dòng | Hỏi trong khung chat hoặc phiếu `duyet.xlsx` | Phiếu `duyet.xlsx` (tải về, điền, tải lên lại) |
+
+**Codex:** chép thư mục skill vào thư mục skills người dùng:
+
+```bash
+git clone https://github.com/trucvanne/eform-builder.git ~/.agents/skills/eform-builder
+```
+
+- Windows: `%USERPROFILE%\.agents\skills\eform-builder`.
+- Codex bản cũ có thể đọc `~/.codex/skills`; nếu Codex không thấy skill, chép thêm vào đó.
+- Gọi bằng cách nói "cấu hình eform từ excel …". Codex đọc `SKILL.md`, chạy lệnh và mở trình duyệt trên máy bạn như Claude Code.
+
+**ChatGPT web:** xem các bước và câu lệnh mẫu ở [`HUONG_DAN_CHAY_TAY.md` → Dùng ChatGPT web cho phần dữ liệu](HUONG_DAN_CHAY_TAY.md#dùng-chatgpt-web-cho-phần-dữ-liệu).
+
+**Dữ liệu nhà nước:** file tải lên hoặc được AI đọc (ChatGPT, Codex, Claude, …) sẽ gửi lên máy chủ của hãng AI. Kiểm tra quy định của đơn vị trước khi dùng.
 
 ## Cấu trúc
 

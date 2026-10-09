@@ -20,4 +20,5 @@ Quy trình đầy đủ và lệnh: **đọc `SKILL.md` trước khi làm**. Fil
 - Không có `AskUserQuestion`: hỏi bằng tin nhắn thường, mỗi lần 1 dòng (hoặc liệt kê có số và chờ người dùng trả lời từng số), hoặc dùng `duyet.xlsx`.
 - Lệnh Python: Windows dùng `python` hoặc `py` thay cho `python3`.
 - Trình duyệt: `python scripts/browser.py list` để xem máy có gì; `python scripts/browser.py open --url https://<domain>/authenticate` để mở (Chrome/Edge/Cốc Cốc/Brave/Chromium). Firefox/WebKit dùng Playwright: thêm `--browser firefox --base-url https://<domain>` khi chạy `eform_builder.py`.
-- AI dạng chat trên web (không chạy được lệnh trên máy): người dùng làm theo `HUONG_DAN_CHAY_TAY.md`, AI chỉ hỗ trợ đọc bảng phát hiện.
+- AI chạy code trên máy chủ (ChatGPT web, môi trường sandbox): chỉ chạy `excel_to_spec.py`, `review_spec.py`, `apply_fixes.py` và đưa file cho người dùng tải về. Không chạy `browser.py` / `eform_builder.py`; người dùng tự chạy trên máy theo `HUONG_DAN_CHAY_TAY.md` mục 1 và 4.
+- AI dạng chat không chạy được code: người dùng làm theo `HUONG_DAN_CHAY_TAY.md`, AI chỉ hỗ trợ đọc bảng phát hiện.

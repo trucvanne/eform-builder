@@ -67,6 +67,30 @@ python scripts\eform_builder.py verify --spec spec.fixed.json --form tinh
 - Lệnh 3 đọc lại từ hệ thống và so với spec: phải in `KHỚP`.
 - Firefox: thêm `--browser firefox --base-url "https://<domain-đơn-vị>"` vào cả 3 lệnh; mỗi lần chạy, đăng nhập trong cửa sổ Firefox mà script mở.
 
+## Dùng ChatGPT web cho phần dữ liệu
+ChatGPT web/app chat chạy được bước 2–3 (đọc Excel, rà soát, áp dụng duyệt) trên máy chủ OpenAI, **không** chạy được bước 1 và 4 (trình duyệt). Dùng Codex thì làm được đủ quy trình: xem `README.md`.
+
+1. Tải lên khung chat: file zip của skill (`eform-builder-skill.zip` hoặc **Code → Download ZIP** trên GitHub) và file Excel biểu mẫu. Nếu tài khoản có tính năng **Skills**, có thể tải thư mục skill lên một lần tại **Create → Upload from your computer**, sau đó chỉ cần tải file Excel.
+2. Gõ câu lệnh (sửa phần trong `< >`):
+   ```text
+   Giải nén eform-builder-skill.zip, đọc SKILL.md. Cài openpyxl nếu chưa có.
+   Chạy: python scripts/excel_to_spec.py "<file>.xlsx" --sheet <Sheet> --key <khoa> --group "<Nhóm>" --attr <ThuocTinh> --fixed "B,C,D" --spec spec.json
+   Rồi chạy: python scripts/review_spec.py spec.json --source-title "<tiêu đề kỳ báo cáo>" --out findings.json --xlsx duyet.xlsx
+   KHÔNG tự sửa dữ liệu. Cho tôi tải về duyet.xlsx, spec.json, findings.json.
+   ```
+3. Mở `duyet.xlsx` trên máy, chọn cột **Quyết định** cho từng dòng (như mục 3 ở trên), lưu lại.
+4. Tải `duyet.xlsx` đã điền lên và gõ:
+   ```text
+   Chạy: python scripts/apply_fixes.py spec.json findings.json duyet.xlsx --out spec.fixed.json --log changelog.md
+   Chỉ áp dụng các dòng tôi đã chọn, không sửa thêm gì. Cho tôi tải về spec.fixed.json và changelog.md.
+   ```
+   Nếu ChatGPT báo không còn `spec.json` / `findings.json` (file trong phiên có thể bị xóa sau một thời gian), tải lại 2 file đã lưu ở bước 2.
+5. Chép `spec.fixed.json` vào thư mục skill trên máy, rồi chạy **mục 1** (mở trình duyệt, đăng nhập) và **mục 4** (dry-run → lưu nháp → đối chiếu).
+
+Lưu ý:
+- Cột nhóm cha/con: có thể nhờ ChatGPT sửa `spec.json` theo `examples/spec.example.json`, nhưng đọc lại cây cột trước khi dùng.
+- Không dán mật khẩu, mã đăng nhập vào ChatGPT. File tải lên sẽ nằm trên máy chủ OpenAI: kiểm tra quy định của đơn vị về dữ liệu trước khi tải.
+
 ## Lỗi hay gặp
 | Thông báo | Cách xử lý |
 |---|---|
